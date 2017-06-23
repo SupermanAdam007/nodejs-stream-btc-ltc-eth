@@ -15,6 +15,16 @@ var subscription = ['0~Poloniex~BTC~USD',
 					'2~Poloniex~LTC~USD',
 					'2~Poloniex~LTC~BTC'];
 
+function determineSubscription(message, item, index){
+	if (message.indexOf(item) != -1) {
+    	fs.appendFile('./data/' + item + '.dat', message + '\n', function(err) {
+    	if(err) {
+        	return console.log(err);
+    	}
+	});
+	}
+}
+
 socket.emit('SubAdd', {subs:subscription} );
 
 socket.on("m", function(message){
@@ -25,10 +35,8 @@ socket.on("m", function(message){
 		res = CCC.CURRENT.unpack(message);
 		console.log(res);
 		//updateQuote(res);
-	}*/						
-	fs.appendFile("./test", message + '\n', function(err) {
-    if(err) {
-        return console.log(err);
-    }
-	}); 
-});
+	}*/
+	subscription.forEach(function(item, index){
+			determineSubscription(message, item, index)
+		});
+}); 
