@@ -1,0 +1,39 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="style.css"></link>
+	<title>CryptoCompare Streamer API Example</title>
+</head>
+
+<body>
+
+<div class="wrapper">
+<h1>BTC Market Trades</h1>
+<div>
+	<button class="subs-button">Subscribe</button>
+	<button class="unsubs-button">Unsubscribe</button>
+	<span id="message">Streaming ...</span>
+</div>
+<div class="source"> Source: <a href="http://www.cryptocompare.com">CryptoCompare</a></div>
+<table id="trades">
+	<tr>
+		<th>Market</th>
+		<th>Type</th>
+		<th>ID</th>
+		<th>Price</th>
+		<th>Quantity</th>
+		<th>Total</th>
+	</tr>
+</table>
+</div>
+
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
+<script src="../ccc-streamer-utilities.js"></script>
+<script src="./stream.js"></script>
+
+</body>
+</html>
