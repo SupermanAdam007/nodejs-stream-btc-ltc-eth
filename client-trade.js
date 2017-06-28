@@ -1,9 +1,6 @@
 var socket = require('socket.io-client')('https://streamer.cryptocompare.com/');
 var fs = require('fs');
 
-//Format: {SubscriptionId}~{ExchangeName}~{FromSymbol}~{ToSymbol}
-//Use SubscriptionId 0 for TRADE, 2 for CURRENT and 5 for CURRENTAGG
-//For aggregate quote updates use CCCAGG as market
 var subscription = ['0~Poloniex~BTC~USD', 
 					'0~Poloniex~ETH~USD', 
 					'0~Poloniex~ETH~BTC', 
@@ -15,27 +12,52 @@ var subscription = ['0~Poloniex~BTC~USD',
 					'2~Poloniex~LTC~USD',
 					'2~Poloniex~LTC~BTC'];
 
+function repairCurrent(m){
+	return [m[6], m[5]].join(';');
+}
+
+function repairTrade(m){
+	return [m[6], m[4], m[9]].join(';');
+}
+
 function determineSubscription(message, item, index){
 	if (message.indexOf(item) != -1) {
-    	fs.appendFile('./data/' + item + '.dat', message + '\n', function(err) {
+		splitedLine = message.split('~');
+		messageRes = '';
+		if (splitedLine[0] == 0) {
+			messageRes = repairTrade(splitedLine);
+		} else if (splitedLine[0] == 2) {
+			messageRes = repairCurrent(splitedLine);
+		}
+    	fs.appendFile('./data/'+ date_dir_name + '/' + item + '.dat', messageRes + '\n', function(err) {
     	if(err) {
-        	return console.log(err);
+        	return console.error(err);
     	}
 	});
 	}
 }
 
 socket.emit('SubAdd', {subs:subscription} );
+//socket.emit('SubRemove', {subs:subscription} );
 
 socket.on("m", function(message){
 	var messageType = message.substring(0, message.indexOf("~"));
 	var res = {};
 	console.log(message);
-	/*if (messageType === CCC.STATIC.TYPE.CURRENTAGG) {
-		res = CCC.CURRENT.unpack(message);
-		console.log(res);
-		//updateQuote(res);
-	}*/
+	
+	subscription.forEach(function(item, index){
+			date_dir_name = Math.round(new Date().getTime()/(1000*60)); //date_dir_name = Math.round(new Date().getTime()/(1000*60*10));
+			fs.mkdir('./data/' + date_dir_name, (err, data) => {
+	  			if (err) {
+    	  			return;
+    			}
+			});
+			fs.appendFile('./data/'+ date_dir_name + '/' + item + '.dat', '', function(err) {
+    		if(err) {
+        		return console.error(err);
+    		}
+			});
+		});
 	subscription.forEach(function(item, index){
 			determineSubscription(message, item, index)
 		});
