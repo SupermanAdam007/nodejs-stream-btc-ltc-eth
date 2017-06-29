@@ -1,5 +1,6 @@
 var socket = require('socket.io-client')('https://streamer.cryptocompare.com/');
 var fs = require('fs');
+var dateFormat = require('dateformat');
 
 var subscription = ['0~Poloniex~BTC~USD', 
 					'0~Poloniex~ETH~USD', 
@@ -13,11 +14,11 @@ var subscription = ['0~Poloniex~BTC~USD',
 					'2~Poloniex~LTC~BTC'];
 
 function repairCurrent(m){
-	return [m[6], m[5]].join(';');
+	return [dateFormat(new Date(parseInt(m[6])*1000), 'yyyy-mm-dd hh:mm:ss'), m[5]].join(';');
 }
 
 function repairTrade(m){
-	return [m[6], m[4], m[9]].join(';');
+	return [dateFormat(new Date(parseInt(m[6])*1000), 'yyyy-mm-dd hh:mm:ss'), m[4], m[9]].join(';');
 }
 
 function determineSubscription(message, item, index){
@@ -37,8 +38,8 @@ function determineSubscription(message, item, index){
 	}
 }
 
-socket.emit('SubAdd', {subs:subscription} );
 //socket.emit('SubRemove', {subs:subscription} );
+socket.emit('SubAdd', {subs:subscription} );
 
 socket.on("m", function(message){
 	var messageType = message.substring(0, message.indexOf("~"));
